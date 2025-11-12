@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>闹钟提醒</title>
+    <style>
+        /* 基本重置和全局样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "微软雅黑", Arial, sans-serif; /* 使用与Python脚本相似的字体 */
+            overflow: hidden; /* 防止主内容区域出现滚动条 */
+            background-color: #f0f0f0; /* 背景色，可选 */
+        }
+
+        /* 初始提示窗口样式 */
+        #single-tip {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* 精确居中 */
+            width: 280px;
+            height: 100px;
+            background-color: #bff3f3; /* 与Python脚本相同的青色背景 */
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000; /* 确保初始窗口在最上层 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            cursor: pointer; /* 提示可点击 */
+        }
+
+        /* 窗口标题栏样式 (模拟) */
+        .window-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 5px;
+            box-sizing: border-box;
+            font-size: 0.8em;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .close-btn {
+            cursor: pointer;
+            font-weight: bold;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .close-btn:hover {
+             background-color: #ffcccc; /* 悬停效果 */
+        }
+
+        /* 批量弹窗容器 */
+        #batch-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 容器本身不阻挡鼠标事件，让弹窗处理 */
+        }
+
+        /* 批量弹窗通用样式 */
+        .batch-tip {
+            position: absolute;
+            width: 280px;
+            height: 100px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            cursor: pointer; /* 提示可点击 */
+            pointer-events: auto; /* 弹窗需要响应鼠标事件 */
+            box-sizing: border-box;
+            overflow: hidden; /* 防止内容溢出 */
+        }
+
+        /* 可选：为弹窗添加一些动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .batch-tip {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- 初始提示窗口 -->
+<div id="single-tip" onclick="startBatchTips()">
+    <div class="window-header">
+        <span>专属提示</span>
+        <span class="close-btn" onclick="event.stopPropagation(); startBatchTips();">&times;</span> <!-- 阻止冒泡，避免触发div的onclick -->
+    </div>
+    <div style="margin-top: 20px;">早上好</div> <!-- 调整文本位置避免与标题重叠 -->
+</div>
+
+<!-- 用于存放批量弹窗的容器 -->
+<div id="batch-container"></div>
+
+<script>
+    // 预定义提示语和背景色
+    const tips = Array(15).fill('起床'); // 创建一个包含15个"起床"的数组
+    const bgColors = [
+        "#c2fad5","#b1f7ec","#acc6f9","#e9bff5",
+        "#f7b3c0","#c5f9d6","#f1d3b9","#f8caed","#b2e0f6"
+    ];
+
+    let batchWindows = []; // 存储对批量弹窗元素的引用
+    let batchCount = 100; // 要创建的弹窗总数
+    let createdCount = 0; // 已创建的弹窗数量
+    let creationInterval; // 用于存储定时器ID
+
+    // 显示单个提示窗口 (此函数在HTML中通过onclick调用)
+    function showSingleTip() {
+        document.getElementById('single-tip').style.display = 'flex'; // 确保初始窗口可见
+    }
+
+    // 启动批量提示 (此函数在点击初始窗口或其关闭按钮时调用)
+    function startBatchTips() {
+        console.log("开始创建批量弹窗...");
+        const singleTipElement = document.getElementById('single-tip');
+        if (singleTipElement) {
+            singleTipElement.style.display = 'none'; // 隐藏初始窗口
+        }
+        createBatchWindow(); // 开始创建弹窗
+    }
+
+    // 创建单个批量弹窗
+    function createSingleBatchWindow() {
+        if (createdCount >= batchCount) {
+            clearInterval(creationInterval); // 停止定时器
+            console.log("所有弹窗创建完成。");
+            return;
+        }
+
+        const container = document.getElementById('batch-container');
+        const windowElement = document.createElement('div');
+        windowElement.className = 'batch-tip';
+
+        // 设置随机位置
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const windowWidth = 280;
+        const windowHeight = 100;
+        const x = Math.floor(Math.random() * (screenWidth - windowWidth));
+        const y = Math.floor(Math.random() * (screenHeight - windowHeight));
+        windowElement.style.left = x + 'px';
+        windowElement.style.top = y + 'px';
+
+        // 设置随机背景色
+        const bgColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+        windowElement.style.backgroundColor = bgColor;
+
+        // 设置提示文本 (随机选择，但这里都是"起床")
+        const tipText = tips[Math.floor(Math.random() * tips.length)];
+        windowElement.innerHTML = `
+            <div class="window-header">
+                <span>警告</span>
+                 <span class="close-btn" onclick="event.stopPropagation(); removeWindow(this.parentElement.parentElement);">&times;</span>
+            </div>
+            <div style="margin-top: 20px;">${tipText}</div>
+        `;
+
+        // 添加点击事件监听器到整个弹窗
+        windowElement.addEventListener('click', function() {
+             removeWindow(this);
+        });
+
+        container.appendChild(windowElement);
+        batchWindows.push(windowElement); // 将引用存入数组
+        createdCount++;
+    }
+
+    // 递归或循环创建弹窗 - 使用定时器模拟递归延迟
+    function createBatchWindow() {
+         // 使用 setInterval 模拟 setTimeout 的递归调用，但更易于控制和停止
+         creationInterval = setInterval(() => {
+             createSingleBatchWindow();
+             if (createdCount >= batchCount) {
+                 clearInterval(creationInterval);
+                 console.log("所有弹窗创建完成。");
+             }
+         }, 50); // 每50毫秒创建一个
+    }
+
+    // 移除单个窗口
+    function removeWindow(windowElement) {
+         if (windowElement && windowElement.parentNode) {
+             windowElement.parentNode.removeChild(windowElement);
+             // 从数组中移除引用 (可选，但有助于内存管理)
+             const index = batchWindows.indexOf(windowElement);
+             if (index > -1) {
+                 batchWindows.splice(index, 1);
+             }
+         }
+    }
+
+    // 关闭所有窗口并退出
+    function closeAllWindowsAndExit() {
+        console.log("检测到空格键，正在关闭所有窗口...");
+        // 隐藏初始窗口
+        const singleTipElement = document.getElementById('single-tip');
+        if (singleTipElement) {
+            singleTipElement.style.display = 'none';
+        }
+
+        // 清除定时器，防止继续创建新窗口
+        if (creationInterval) {
+            clearInterval(creationInterval);
+        }
+
+        // 移除所有已创建的批量窗口
+        const container = document.getElementById('batch-container');
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
+        batchWindows = []; // 清空引用数组
+        createdCount = 0; // 重置计数器
+
+        // 显示退出信息或简单地停止交互
+        document.body.innerHTML = '<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2em; color: green;">程序已退出</div>';
+        console.log("所有窗口已关闭，程序退出。");
+    }
+
+    // 监听键盘事件 (主要是空格键)
+    document.addEventListener('keydown', function(event) {
+        if (event.code === 'Space') { // 推荐使用 event.code
+            event.preventDefault(); // 防止空格键在页面上产生默认行为（如滚动）
+            closeAllWindowsAndExit();
+        }
+    });
+
+    // 页面加载完成后显示初始窗口
+    window.onload = function() {
+        showSingleTip();
+    };
+
+</script>
+
+</body>
+</html>
