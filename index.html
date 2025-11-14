@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathMaster - 高中数学学习平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #67c23a;
+            --warning-color: #e6a23c;
+            --danger-color: #f56c6c;
+            --info-color: #909399;
+            --text-primary: #303133;
+            --text-regular: #606266;
+            --text-secondary: #909399;
+            --border-color: #dcdfe6;
+            --background-color: #f5f5f5;
+            --card-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 导航栏 */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-regular);
+            font-weight: 500;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary-color);
+        }
+
+        /* 用户信息卡片 */
+        .user-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+            margin: 0 auto;
+        }
+
+        .user-info h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .user-info p {
+            color: var(--text-regular);
+            margin-bottom: 5px;
+        }
+
+        .user-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--background-color);
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* 学习模块 */
+        .learning-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: var(--text-regular);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .themes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .theme-card {
+            background: var(--background-color);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .theme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow);
+            border-color: var(--primary-color);
+        }
+
+        .theme-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .theme-card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .theme-card p {
+            color: var(--text-regular);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 关卡系统 */
+        .levels-container {
+            display: grid;
+            gap: 30px;
+        }
+
+        .theme-levels {
+            background: var(--background-color);
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .theme-levels h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .levels-grid {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .level-item {
+            width: 60px;
+            height: 60px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .level-item:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .level-item.completed {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        /* 心得模块 */
+        .notes-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .note-card {
+            background: var(--background-color);
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+
+        .note-card:hover {
+            box-shadow: var(--card-shadow);
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .note-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .note-type {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .type-basic {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .type-advanced {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .type-challenge {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .note-content {
+            color: var(--text-regular);
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .note-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .note-actions span {
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .note-actions span:hover {
+            color: var(--primary-color);
+        }
+
+        /* 关于我们 */
+        .about-content {
+            background: var(--background-color);
+            border-radius: 15px;
+            padding: 30px;
+            line-height: 1.8;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .team-member {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+        }
+
+        .member-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+        }
+
+        /* 联系我们 */
+        .contact-form {
+            background: var(--background-color);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .user-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .user-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .themes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .levels-grid {
+                justify-content: center;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* 隐藏页面 */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* 登录界面 */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .demo-info {
+            background: var(--background-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-regular);
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录页面 -->
+    <div id="loginPage" class="page active">
+        <div class="login-container">
+            <div class="login-card fade-in">
+                <div class="login-header">
+                    <h1>📐 MathMaster</h1>
+                    <p>高中数学学习平台</p>
+                </div>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" class="form-control" id="username" placeholder="请输入用户名" required>
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" class="form-control" id="password" placeholder="请输入密码" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">
+                        登录
+                    </button>
+                </form>
+                
+                <div class="demo-info">
+                    <p><strong>演示账号：</strong></p>
+                    <p>用户名：demo</p>
+                    <p>密码：123456</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主应用 -->
+    <div id="mainApp" class="page">
+        <div class="container">
+            <!-- 导航栏 -->
+            <header>
+                <nav>
+                    <div class="logo">
+                        📐 MathMaster
+                    </div>
+                    <ul class="nav-links">
+                        <li><a href="#" onclick="showPage('dashboard')" class="nav-link active">首页</a></li>
+                        <li><a href="#" onclick="showPage('learning')" class="nav-link">学习</a></li>
+                        <li><a href="#" onclick="showPage('notes')" class="nav-link">心得</a></li>
+                        <li><a href="#" onclick="showPage('about')" class="nav-link">关于</a></li>
+                        <li><a href="#" onclick="showPage('contact')" class="nav-link">联系</a></li>
+                        <li><a href="#" onclick="logout()">退出</a></li>
+                    </ul>
+                </nav>
+            </header>
+
+            <!-- 首页 -->
+            <div id="dashboard" class="page-content active">
+                <div class="user-card fade-in">
+                    <div class="user-avatar">👨‍🎓</div>
+                    <div class="user-info">
+                        <h2>数学小达人</h2>
+                        <p><strong>年级：</strong>高二</p>
+                        <p><strong>数学特长：</strong>函数与导数</p>
+                        <p><strong>学习目标：</strong>冲击高考数学145+</p>
+                        <p><strong>挑战方向：</strong>函数综合题、导数应用</p>
+                        
+                        <div class="user-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">12</span>
+                                <span class="stat-label">已通关</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">8</span>
+                                <span class="stat-label">心得数</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">15</span>
+                                <span class="stat-label">连续天数</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">380</span>
+                                <span class="stat-label">积分</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="learning-section fade-in">
+                    <div class="section-header">
+                        <h2 class="section-title">🚀 快速开始</h2>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <button class="btn btn-primary" style="padding: 15px; font-size: 16px;" onclick="showPage('learning')">
+                            📚 开始学习
+                        </button>
+                        <button class="btn btn-primary" style="padding: 15px; font-size: 16px;" onclick="showPage('notes')">
+                            💡 查看心得
+                        </button>
+                        <button class="btn btn-primary" style="padding: 15px; font-size: 16px;" onclick="alert('每日打卡功能开发中...')">
+                            📅 每日打卡
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 学习页面 -->
+            <div id="learning" class="page-content">
+                <div class="learning-section fade-in">
+                    <div class="section-header">
+                        <h2 class="section-title">📚 数学学习中心</h2>
+                    </div>
+                    
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('context')">🌟 情境引定义</button>
+                        <button class="tab" onclick="switchTab('practice')">🎯 刷题进阶学</button>
+                    </div>
+
+                    <!-- 情境引定义 -->
+                    <div id="contextTab" class="tab-content">
+                        <div class="themes-grid">
+                            <div class="theme-card" onclick="showThemeDetail('函数的奥秘')">
+                                <div class="theme-icon">🎡</div>
+                                <h3>函数的奥秘</h3>
+                                <p>通过游乐园摩天轮的运动轨迹，理解函数输入与输出的关系，感受数学描述现实世界的美妙。</p>
+                                <button class="btn btn-primary">开始学习</button>
+                            </div>
+                            
+                            <div class="theme-card" onclick="showThemeDetail('指数与对数')">
+                                <div class="theme-icon">🧬</div>
+                                <h3>指数与对数</h3>
+                                <p>观察生物细胞分裂过程，体验指数爆炸式增长，理解指数函数的威力与对数的运算规律。</p>
+                                <button class="btn btn-primary">开始学习</button>
+                            </div>
+                            
+                            <div class="theme-card" onclick="showThemeDetail('三角函数')">
+                                <div class="theme-icon">🌊</div>
+                                <h3>三角函数</h3>
+                                <p>通过海洋潮汐的周期性涨落，掌握三角函数的周期特性，理解正弦余弦的波动规律。</p>
+                                <button class="btn btn-primary">开始学习</button>
+                            </div>
+                            
+                            <div class="theme-card" onclick="showThemeDetail('数列与求和')">
+                                <div class="theme-icon">💰</div>
+                                <h3>数列与求和</h3>
+                                <p>通过理财投资的复利计算，体会数列递推与求和的实际应用，掌握数学建模思维。</p>
+                                <button class="btn btn-primary">开始学习</button>
+                            </div>
+                            
+                            <div class="theme-card" onclick="showThemeDetail('导数初探')">
+                                <div class="theme-icon">🚗</div>
+                                <h3>导数初探</h3>
+                                <p>分析汽车从静止到高速的加速曲线，理解导数描述变化率的本质，掌握微积分基础。</p>
+                                <button class="btn btn-primary">开始学习</button>
+                            </div>
+                            
+                            <div class="theme-card" onclick="showThemeDetail('概率统计')">
+                                <div class="theme-icon">🎲</div>
+                                <h3>概率统计</h3>
+                                <p>通过日常抽奖游戏，理解概率统计的基本概念，学会用数学思维分析随机事件。</p>
+                                <button class="btn btn-primary">开始学习</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 刷题进阶学 -->
+                    <div id="practiceTab" class="tab-content" style="display: none;">
+                        <div class="levels-container">
+                            <div class="theme-levels">
+                                <h3>🎡 函数的奥秘</h3>
+                                <div class="levels-grid">
+                                    <div class="level-item completed">✓</div>
+                                    <div class="level-item completed">✓</div>
+                                    <div class="level-item completed">✓</div>
+                                    <div class="level-item">4</div>
+                                    <div class="level-item">5</div>
+                                    <div class="level-item">6</div>
+                                </div>
+                            </div>
+                            
+                            <div class="theme-levels">
+                                <h3>🧬 指数与对数</h3>
+                                <div class="levels-grid">
+                                    <div class="level-item completed">✓</div>
+                                    <div class="level-item completed">✓</div>
+                                    <div class="level-item">3</div>
+                                    <div class="level-item">4</div>
+                                    <div class="level-item">5</div>
+                                    <div class="level-item">6</div>
+                                </div>
+                            </div>
+                            
+                            <div class="theme-levels">
+                                <h3>🌊 三角函数</h3>
+                                <div class="levels-grid">
+                                    <div class="level-item completed">✓</div>
+                                    <div class="level-item">2</div>
+                                    <div class="level-item">3</div>
+                                    <div class="level-item">4</div>
+                                    <div class="level-item">5</div>
+                                    <div class="level-item">6</div>
+                                </div>
+                            </div>
+                            
+                            <div class="theme-levels">
+                                <h3>💰 数列与求和</h3>
+                                <div class="levels-grid">
+                                    <div class="level-item completed">✓</div>
+                                    <div class="level-item">2</div>
+                                    <div class="level-item">3</div>
+                                    <div class="level-item">4</div>
+                                    <div class="level-item">5</div>
+                                    <div class="level-item">6</div>
+                                </div>
+                            </div>
+                            
+                            <div class="theme-levels">
+                                <h3>🚗 导数初探</h3>
+                                <div class="levels-grid">
+                                    <div class="level-item">1</div>
+                                    <div class="level-item">2</div>
+                                    <div class="level-item">3</div>
+                                    <div class="level-item">4</div>
+                                    <div class="level-item">5</div>
+                                    <div class="level-item">6</div>
+                                </div>
+                            </div>
+                            
+                            <div class="theme-levels">
+                                <h3>🎲 概率统计</h3>
+                                <div class="levels-grid">
+                                    <div class="level-item">1</div>
+                                    <div class="level-item">2</div>
+                                    <div class="level-item">3</div>
+                                    <div class="level-item">4</div>
+                                    <div class="level-item">5</div>
+                                    <div class="level-item">6</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 心得页面 -->
+            <div id="notes" class="page-content">
+                <div class="learning-section fade-in">
+                    <div class="section-header">
+                        <h2 class="section-title">💡 学习心得与讨论</h2>
+                    </div>
+                    
+                    <div class="notes-grid">
+                        <div class="note-card">
+                            <div class="note-header">
+                                <h3 class="note-title">函数定义域的理解技巧</h3>
+                                <span class="note-type type-basic">入门心得</span>
+                            </div>
+                            <p class="note-content">
+                                求函数定义域要记住三要素：根号内非负、分母不为零、对数真数大于零。
+                                建议画个数轴帮助理解！特别是复合函数的定义域，要从内向外逐层分析。
+                                比如求f(x)=√(x-2)/(x-3)的定义域，需要同时满足x-2≥0和x-3≠0。
+                            </p>
+                            <div class="note-footer">
+                                <div>👤 数学小达人 · 2025-11-14</div>
+                                <div class="note-actions">
+                                    <span>👍 25</span>
+                                    <span>💬 8</span>
+                                    <span>⭐ 收藏</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="note-card">
+                            <div class="note-header">
+                                <h3 class="note-title">三角函数图像变换记忆口诀</h3>
+                                <span class="note-type type-advanced">进阶心得</span>
+                            </div>
+                            <p class="note-content">
+                                左加右减对自变量，上加下减对整体。周期变换看ω，值域变化看A和k。
+                                这个口诀帮我记住了所有变换规则！比如y=2sin(3x-π/2)+1，
+                                可以分解为：振幅2，周期2π/3，相位左移π/6，上移1个单位。
+                            </p>
+                            <div class="note-footer">
+                                <div>👤 函数高手 · 2025-11-13</div>
+                                <div class="note-actions">
+                                    <span>👍 42</span>
+                                    <span>💬 15</span>
+                                    <span>⭐ 收藏</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="note-card">
+                            <div class="note-header">
+                                <h3 class="note-title">裂项相消法的进阶应用</h3>
+                                <span class="note-type type-challenge">挑战心得</span>
+                            </div>
+                            <p class="note-content">
+                                遇到1/(n(n+1))形式的数列，用裂项相消。但更复杂的如1/(n(n+2))
+                                需要拆成1/2×(1/n - 1/(n+2))，这个技巧在压轴题中很实用！
+                                关键是找到合适的分拆方式，让中间项能够相互抵消。
+                            </p>
+                            <div class="note-footer">
+                                <div>👤 数列达人 · 2025-11-12</div>
+                                <div class="note-actions">
+                                    <span>👍 68</span>
+                                    <span>💬 23</span>
+                                    <span>⭐ 收藏</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="note-card">
+                            <div class="note-header">
+                                <h3 class="note-title">导数在生活中的应用</h3>
+                                <span class="note-type type-advanced">进阶心得</span>
+                            </div>
+                            <p class="note-content">
+                                导数其实就是瞬时变化率。比如汽车速度表显示的就是位移对时间的导数。
+                                经济学中的边际成本、边际收益也是导数的应用。理解了这一点，
+                                抽象的导数概念就变得具体了！
+                            </p>
+                            <div class="note-footer">
+                                <div>👤 导数小王子 · 2025-11-11</div>
+                                <div class="note-actions">
+                                    <span>👍 35</span>
+                                    <span>💬 12</span>
+                                    <span>⭐ 收藏</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 关于我们 -->
+            <div id="about" class="page-content">
+                <div class="learning-section fade-in">
+                    <div class="section-header">
+                        <h2 class="section-title">📖 关于 MathMaster</h2>
+                    </div>
+                    
+                    <div class="about-content">
+                        <h3>🎯 平台介绍</h3>
+                        <p>
+                            MathMaster 是由资深高中数学教师与专业开发团队联合打造的创新数学学习平台。
+                            我们坚信"以刷题代学、以情境引定义"的核心理念，通过真实情境激发学习兴趣，
+                            让学生在解题中自然理解抽象概念，实现边学边练、边练边闯关的高效学习模式。
+                        </p>
+                        
+                        <h3 style="margin-top: 25px;">✨ 核心优势</h3>
+                        <ul style="margin-left: 20px; line-height: 2;">
+                            <li><strong>情境化学习：</strong>六大主题，每个都通过真实生活情境引入，让数学不再抽象</li>
+                            <li><strong>梯度式训练：</strong>从基础到拔高，科学设置关卡难度，循序渐进提升能力</li>
+                            <li><strong>积分激励系统：</strong>通关获得积分，连续打卡奖励，让学习充满成就感</li>
+                            <li><strong>同伴交流社区：</strong>分享学习心得，交流解题思路，共同进步成长</li>
+                        </ul>
+                        
+                        <h3 style="margin-top: 25px;">👥 团队介绍</h3>
+                        <div class="team-grid">
+                            <div class="team-member">
+                                <div class="member-avatar">👨‍🏫</div>
+                                <h4>王老师</h4>
+                                <p>资深数学教师<br>20年教学经验</p>
+                            </div>
+                            <div class="team-member">
+                                <div class="member-avatar">👩‍💻</div>
+                                <h4>李工程师</h4>
+                                <p>技术负责人<br>10年开发经验</p>
+                            </div>
+                            <div class="team-member">
+                                <div class="member-avatar">🎨</div>
+                                <h4>张设计师</h4>
+                                <p>UI/UX设计师<br>专注教育产品</p>
+                            </div>
+                            <div class="team-member">
+                                <div class="member-avatar">📊</div>
+                                <h4>陈分析师</h4>
+                                <p>数据分析师<br>学习行为研究</p>
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin-top: 25px;">🌟 平台愿景</h3>
+                        <p>
+                            让每一个高中生都能享受数学学习的乐趣，在轻松愉快的氛围中掌握数学知识，
+                            冲击高考高分，培养逻辑思维能力，为未来的学习和生活打下坚实基础。
+                            我们相信，数学不应该是负担，而应该是探索世界的工具！
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 联系我们 -->
+            <div id="contact" class="page-content">
+                <div class="learning-section fade-in">
+                    <div class="section-header">
+                        <h2 class="section-title">📧 联系我们</h2>
+                    </div>
+                    
+                    <div class="contact-form">
+                        <form id="contactForm">
+                            <div class="form-group">
+                                <label>姓名 *</label>
+                                <input type="text" class="form-control" id="contactName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>联系方式 *</label>
+                                <input type="text" class="form-control" id="contactContact" placeholder="邮箱或手机号" required>
+                            </div>
+                            <div class="form-group">
+                                <label>问题描述 *</label>
+                                <textarea class="form-control" id="contactMessage" placeholder="请详细描述您的问题或建议..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">
+                                提交反馈
+                            </button>
+                        </form>
+                        
+                        <div style="margin-top: 30px; text-align: center; color: var(--text-regular);">
+                            <p>📧 邮箱：support@mathmaster.com</p>
+                            <p>📱 电话：400-123-4567</p>
+                            <p>🕐 工作时间：周一至周五 9:00-18:00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 登录功能
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'demo' && password === '123456') {
+                document.getElementById('loginPage').classList.remove('active');
+                document.getElementById('mainApp').classList.add('active');
+                showNotification('登录成功！欢迎来到 MathMaster', 'success');
+            } else {
+                showNotification('用户名或密码错误！', 'error');
+            }
+        });
+
+        // 页面切换
+        function showPage(pageId) {
+            // 隐藏所有页面内容
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // 显示选中的页面
+            document.getElementById(pageId).classList.add('active');
+            
+            // 更新导航栏激活状态
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // 标签页切换
+        function switchTab(tabName) {
+            // 更新标签按钮状态
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 切换内容
+            if (tabName === 'context') {
+                document.getElementById('contextTab').style.display = 'block';
+                document.getElementById('practiceTab').style.display = 'none';
+            } else {
+                document.getElementById('contextTab').style.display = 'none';
+                document.getElementById('practiceTab').style.display = 'block';
+            }
+        }
+
+        // 显示主题详情
+        function showThemeDetail(themeName) {
+            const details = {
+                '函数的奥秘': {
+                    concepts: ['定义域与值域', '函数的表示方法', '函数的单调性', '函数的奇偶性'],
+                    example: '摩天轮高度 h(t) = 20sin(πt/10) + 35'
+                },
+                '指数与对数': {
+                    concepts: ['指数函数的性质', '对数运算规则', '指数与对数的关系', '实际应用问题'],
+                    example: '细胞分裂：N(t) = N₀ × 2^t'
+                },
+                '三角函数': {
+                    concepts: ['任意角与弧度制', '三角函数的定义', '诱导公式', '三角函数的图像与性质'],
+                    example: '潮汐高度：h(t) = 2sin(πt/6) + 3'
+                },
+                '数列与求和': {
+                    concepts: ['等差数列', '等比数列', '数列求和方法', '递推数列'],
+                    example: '复利计算：A = P(1 + r)^n'
+                },
+                '导数初探': {
+                    concepts: ['导数的定义', '导数的几何意义', '基本求导公式', '导数的应用'],
+                    example: '瞬时速度：v = ds/dt'
+                },
+                '概率统计': {
+                    concepts: ['随机事件', '概率的计算', '统计图表', '统计量分析'],
+                    example: '抽奖概率：P = 有利事件数 / 总事件数'
+                }
+            };
+            
+            const detail = details[themeName];
+            if (detail) {
+                let message = `📚 ${themeName}\n\n💡 核心概念：\n`;
+                detail.concepts.forEach(concept => {
+                    message += `• ${concept}\n`;
+                });
+                message += `\n🌟 生活实例：\n${detail.example}`;
+                
+                alert(message);
+            }
+        }
+
+        // 联系表单提交
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('contactName').value;
+            const contact = document.getElementById('contactContact').value;
+            const message = document.getElementById('contactMessage').value;
+            
+            showNotification('反馈提交成功！我们会尽快回复您。', 'success');
+            this.reset();
+        });
+
+        // 退出登录
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                document.getElementById('mainApp').classList.remove('active');
+                document.getElementById('loginPage').classList.add('active');
+                document.getElementById('loginForm').reset();
+            }
+        }
+
+        // 通知功能
+        function showNotification(message, type = 'info') {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${type === 'success' ? '#67c23a' : type === 'error' ? '#f56c6c' : '#909399'};
+                color: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            // 添加动画样式
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // 3秒后自动移除
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            fadeElements.forEach((element, index) => {
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // 关卡点击事件
+        document.querySelectorAll('.level-item').forEach(item => {
+            item.addEventListener('click', function() {
+                if (!this.classList.contains('completed')) {
+                    const level = this.textContent;
+                    showNotification(`开始第 ${level} 关！`, 'info');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
